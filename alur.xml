@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="2.5" type="plugin" group="jea" method="upgrade">
-	<name>JEA - ALUR</name>
+	<name>plg_jea_alur</name>
 	<author>Sylvain Philip</author>
 	<creationDate>jan 2015</creationDate>
 	<copyright>Copyright (C) 2015 Sylvain Philip.</copyright>
@@ -8,7 +8,7 @@
 	<authorEmail>contact@sphilip.com</authorEmail>
 	<authorUrl>www.sphilip.com</authorUrl>
 	<version>1.0</version>
-	<description>Ajoute le support des champs obligatoires de la loi ALUR</description>
+	<description>PLG_JEA_ALUR_DESCRIPTION</description>
 
 	<scriptfile>script.php</scriptfile>
 
@@ -20,17 +20,38 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic">
-				<field	name="title" type="text" default="Loi ALUR" description="Titre" label="Titre à afficher sur la fiche publique du bien" />
-				<field	name="calculate_fees_percent" type="radio" default="1" description="Calculer le taux honoraires" label="Calculer automatiquement le taux honoraires">
-					<option value="0">JNo</option>
-					<option value="1">JYes</option>
+				<field
+					name="title"
+					type="text"
+					default="Loi ALUR"
+					label="PLG_JEA_ALUR_FIELD_PUBLIC_TITLE_LABEL"
+					description="PLG_JEA_ALUR_FIELD_PUBLIC_TITLE_DESC"
+				/>
+
+				<field
+					name="calculate_fees_percent"
+					type="radio"
+					default="1"
+					label="PLG_JEA_ALUR_FIELD_CALCULATE_FEES_LABEL"
+					description="PLG_JEA_ALUR_FIELD_CALCULATE_FEES_DESC"
+					class="btn-group"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
 				</field>
-				<field	name="display_fields" type="radio" default="1" description="Afficher les champs" label="Afficher les champs sur la fiche publique du bien">
-					<option value="0">JNo</option>
-					<option value="1">JYes</option>
+
+				<field
+					name="display_fields"
+					type="radio"
+					default="1"
+					label="PLG_JEA_ALUR_FIELD_DISPLAY_FIELDS_LABEL"
+					description="PLG_JEA_ALUR_FIELD_DISPLAY_FIELDS_DESC"
+					class="btn-group"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
 				</field>
 			</fieldset>
 		</fields>
 	</config>
-
 </extension>
