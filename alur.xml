@@ -14,16 +14,18 @@
 
 	<files>
 		<filename plugin="alur">alur.php</filename>
+		<folder>language</folder>
 	</files>
+
 	<config>
 		<fields name="params">
 			<fieldset name="basic">
 				<field	name="title" type="text" default="Loi ALUR" description="Titre" label="Titre à afficher sur la fiche publique du bien" />
-				<field	name="calculate_fees_percent" type="radio" default="0" description="Calculer le taux honoraires" label="Calculer automatiquement le taux honoraires">
+				<field	name="calculate_fees_percent" type="radio" default="1" description="Calculer le taux honoraires" label="Calculer automatiquement le taux honoraires">
 					<option value="0">JNo</option>
 					<option value="1">JYes</option>
 				</field>
-				<field	name="display_fields" type="radio" default="0" description="Afficher les champs" label="Afficher les champs sur la fiche publique du bien">
+				<field	name="display_fields" type="radio" default="1" description="Afficher les champs" label="Afficher les champs sur la fiche publique du bien">
 					<option value="0">JNo</option>
 					<option value="1">JYes</option>
 				</field>
