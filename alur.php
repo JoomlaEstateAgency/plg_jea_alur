@@ -20,6 +20,18 @@ jimport('joomla.event.plugin');
 class plgJeaAlur extends JPlugin
 {
     /**
+     * Constructor
+     *
+     * @param       object  $subject The object to observe
+     * @param       array   $config  An array that holds the plugin configuration
+     */
+    public function __construct(& $subject, $config)
+    {
+        parent::__construct($subject, $config);
+        $this->loadLanguage();
+    }
+    
+    /**
      * onBeforeSaveProperty method
      *
      * @param string $namespace
@@ -34,6 +46,7 @@ class plgJeaAlur extends JPlugin
 
         $data = array(
             'taux_honoraires' => '',
+            'hon_acq' => 0,
             'copropriete' => 0,
             'nb_lots_copropriete' => 0,
             'montant_quote_part' => 0,
@@ -67,6 +80,7 @@ class plgJeaAlur extends JPlugin
     {
         $data = array(
             'taux_honoraires' => '',
+            'hon_acq' => 0,
             'copropriete' => 0,
             'nb_lots_copropriete' => 0,
             'montant_quote_part' => 0,
@@ -83,27 +97,31 @@ class plgJeaAlur extends JPlugin
         <fieldset class="panelform">
           <ul class="adminformlist">
             <li>
-              <label for="taux_honoraires" class="hasTip" title="Taux honoraire en % à la charge de l\'acquéreur">Taux honoraire : </label>
+              <label for="taux_honoraires" class="hasTip" title="'. JText::_('PLG_JEA_ALUR_FIELD_TAUX_HONORAIRES_DESC') .'">'. JText::_('PLG_JEA_ALUR_FIELD_TAUX_HONORAIRES') .' : </label>
               <input type="text" name="taux_honoraires" id="taux_honoraires" value="'. $data->taux_honoraires .'" class="numberbox" size="5" />
             </li>
             <li>
-              <label for="copropriete" class="hasTip" title="Le bien est-il en copropriété?"> Copopriété : </label>
+              <label for="hon_acq" class="hasTip" title="'. JText::_('PLG_JEA_ALUR_FIELD_HON_ACQ_DESC') .'">'. JText::_('PLG_JEA_ALUR_FIELD_HON_ACQ') .' : </label>
+              <input type="checkbox" name="hon_acq" id="hon_acq" value="1" '. ( $data->hon_acq ? 'checked' : '' ) .' />
+            </li>
+            <li>
+              <label for="copropriete" class="hasTip" title="'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_DESC') .'">'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE') .' : </label>
               <input type="checkbox" name="copropriete" id="copropriete" value="1" '. ( $data->copropriete ? 'checked' : '' ) .' />
             </li>
             <li>
-              <label for="nb_lots_copropriete" class="hasTip" title="Si le bien est en copropriété, indiquez ici le nombre de lots">Nb de lots : </label>
+              <label for="nb_lots_copropriete" class="hasTip" title="'. JText::_('PLG_JEA_ALUR_FIELD_NB_LOTS_DESC') .'">'. JText::_('PLG_JEA_ALUR_FIELD_NB_LOTS') .' : </label>
               <input type="text" name="nb_lots_copropriete" id="nb_lots_copropriete" value="'. $data->nb_lots_copropriete .'" class="numberbox" size="5" />
             </li>
             <li>
-              <label for="montant_quote_part" class="hasTip" title="Indiquez le montant en quote-part des charges de la propriété">Montant des charges : </label>
+              <label for="montant_quote_part" class="hasTip" title="'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_CHARGES_DESC') .'">'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_CHARGES') .' : </label>
               <input type="text" name="montant_quote_part" id="montant_quote_part" value="'. $data->montant_quote_part .'" class="numberbox" size="5" />
             </li>
             <li>
-              <label for="procedure_syndicat" class="hasTip" title="Procédure syndicat">Procédure syndicat : </label>
+              <label for="procedure_syndicat" class="hasTip" title="'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PROCEDURE_DESC') .'">'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PROCEDURE') .' : </label>
               <input type="checkbox" name="procedure_syndicat" id="procedure_syndicat" value="1" '. ( $data->procedure_syndicat ? 'checked' : '' ) .' />
             </li>
             <li>
-              <label for="detail_procedure" class="hasTip" title="Détail de la procédure du syndicat">Détail de la procédure : </label>
+              <label for="detail_procedure" class="hasTip" title="'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PROCEDURE_DETAIL_DESC') .'">'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PROCEDURE_DETAIL') .' : </label>
               <textarea name="detail_procedure" id="detail_procedure" cols="40" rows="5" >'.$data->detail_procedure .'</textarea>
             </li>
            </ul>
@@ -130,7 +148,7 @@ class plgJeaAlur extends JPlugin
         $html = '';
 
         if ($this->params->get('calculate_fees_percent', 1) == 1 && !empty($row->fees)) {
-            $taux = ((float) $row->fees * 100) / ((float) $row->price - (float) $row->fees);
+            $taux = round(((float) $row->fees * 100) / (float) $row->price, 2);
             $data->taux_honoraires = number_format($taux, 2, ',', ' ');
         }
 
@@ -141,16 +159,17 @@ class plgJeaAlur extends JPlugin
         if ($this->params->get('display_fields', 1) == 1) {
 
             $html .= '<table class="jea-data"><tbody>' . PHP_EOL ;
-            if (!empty($data->taux_honoraires)) {
-                $html .= '<tr><th>Taux honoraires</th><td>' . $data->taux_honoraires . ' %</td></tr>'. PHP_EOL;
+            if (!empty($data->taux_honoraires) && !empty($data->hon_acq)) {
+                $html .= '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_TAUX_HONORAIRES') .'</th><td>' . $data->taux_honoraires . ' %</td></tr>'. PHP_EOL;
             }
+            $html .= '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE') .'</th><td>' . ($data->copropriete == 1? 'Oui' : 'Non' ) . '</td></tr>'. PHP_EOL;
 
             if ($data->copropriete == 1) {
-                $html .= '<tr><td colspan="2">Informations sur la copropriété : </td></tr>' . PHP_EOL
-                      . '<tr><th>Nombre de lots</th><td>' . $data->nb_lots_copropriete . '</td></tr>' . PHP_EOL
-                      . '<tr><th>Quote part des charges</th><td>' . $data->montant_quote_part . ' €</td></tr>' . PHP_EOL;
+                $html .= '<tr><td colspan="2">'. JText::_('PLG_JEA_ALUR_COPROPRIETE_INFOS') .' : </td></tr>' . PHP_EOL
+                      . '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_NB_LOTS') .'</th><td>' . $data->nb_lots_copropriete . '</td></tr>' . PHP_EOL
+                      . '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_CHARGES') .'</th><td>' . $data->montant_quote_part . ' € / an</td></tr>' . PHP_EOL;
                 if ($data->procedure_syndicat == 1) {
-                    $html .= '<tr><th>Procédure du syndicat</th><td>' . $data->detail_procedure . ' €</td></tr>' . PHP_EOL;
+                    $html .= '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PROCEDURE') .'</th><td>' . $data->detail_procedure . ' €</td></tr>' . PHP_EOL;
                 }
             }
             $html .= '</tbody></table>'. PHP_EOL;
