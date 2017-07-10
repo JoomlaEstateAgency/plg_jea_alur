@@ -169,7 +169,10 @@ class plgJeaAlur extends JPlugin
                       . '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_NB_LOTS') .'</th><td>' . $data->nb_lots_copropriete . '</td></tr>' . PHP_EOL
                       . '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_CHARGES') .'</th><td>' . $data->montant_quote_part . ' € / an</td></tr>' . PHP_EOL;
                 if ($data->procedure_syndicat == 1) {
-                    $html .= '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PROCEDURE') .'</th><td>' . $data->detail_procedure . ' €</td></tr>' . PHP_EOL;
+                    $html .= '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PROCEDURE') .'</th><td>' . $data->detail_procedure . '</td></tr>' . PHP_EOL;
+                }
+                else {
+                    $html .= '<tr><th>'. JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PROCEDURE') .'</th><td>' . JText::_('PLG_JEA_ALUR_FIELD_COPROPRIETE_PAS_DE_PROCEDURE') . '</td></tr>' . PHP_EOL;
                 }
             }
             $html .= '</tbody></table>'. PHP_EOL;
